@@ -37,7 +37,7 @@ namespace ContentModeratorSDK.Test
             //Create a new list
             //Get all Lists to verify creation
 
-            var imageListclient = new ListManagementClient(ConfigurationManager.AppSettings["subscriptionkey"], ConfigurationManager.AppSettings["listmanagmentrooturl"]);
+            var imageListclient = new ListManagementClient(ConfigurationManager.AppSettings["subscriptionkey"]);
             var listName = Guid.NewGuid().ToString("n");
 
             Dictionary<string, string> listMetaData = new Dictionary<string, string>();
@@ -68,7 +68,7 @@ namespace ContentModeratorSDK.Test
             //Delete Image List
             //Call get all lists to verify deletion
 
-            var imageListclient = new ListManagementClient(ConfigurationManager.AppSettings["subscriptionkey"], ConfigurationManager.AppSettings["listmanagmentrooturl"]);
+            var imageListclient = new ListManagementClient(ConfigurationManager.AppSettings["subscriptionkey"]);
 
             var updateImageList = imageListclient.ImageListUpdateAsync(listId, "Updated Name", "Updated", null).Result;
             Assert.IsNotNull(updateImageList);
