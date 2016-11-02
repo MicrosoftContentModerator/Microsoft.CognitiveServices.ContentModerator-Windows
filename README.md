@@ -1,5 +1,5 @@
 # Microsoft Content Moderator API: Windows Client Library
-This repo contains the Windows client library & sample for the Microsoft Content Moderator API, an offering within [Microsoft Cognitive Services](https://www.microsoft.com/cognitive-services), formerly known as Project Oxford.
+This repo contains the Windows client library & sample for the Microsoft Content Moderator API, an offering within [Microsoft Cognitive Services](https://www.microsoft.com/cognitive-services).
 * [Learn about the Content Moderator](https://www.microsoft.com/cognitive-services/en-us/content-moderator)
 * [Read the documentation](https://www.microsoft.com/cognitive-services/en-us/content-moderator/documentation)
 * [Find more SDKs & Samples](https://www.microsoft.com/cognitive-services/en-us/SDK-Sample?api=content%20moderator)
