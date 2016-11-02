@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ContentModeratorSDK_V2")]
+[assembly: AssemblyTitle("ContentModeratorSDK")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("ContentModeratorSDK_V2")]
+[assembly: AssemblyProduct("ContentModeratorSDK")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("961284a5-1e23-416b-aba0-ff28c2327cab")]
+[assembly: Guid("4c761ca8-efb3-4aa8-8999-9d58c50033a2")]
 
 // Version information for an assembly consists of the following four values:
 //
