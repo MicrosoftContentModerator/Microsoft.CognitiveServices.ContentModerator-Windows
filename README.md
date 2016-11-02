@@ -10,21 +10,15 @@ The client library is a thin C\# client wrapper for the Content Moderator API.
 
 ### Build the Library
  1. Starting in the folder where you clone the repository (this folder)
-
- 2. In a git command line tool, type `git submodule init` (or do this through a UI)
-
- 3. Pull in the shared Windows code by calling `git submodule update`
-
- 4. Start Microsoft Visual Studio 2015 and select `File > Open > Project/Solution`.
  
- 5. Double-click the Visual Studio 2015 Solution (.sln) file.
+ 3. Start Microsoft Visual Studio 2015 and select `File > Open > Project/Solution`.
+ 
+ 4. Double-click the Visual Studio 2015 Solution (.sln) file.
 
- 6. Press Ctrl+Shift+B, or select `Build > Build Solution`.
+ 5. Press Ctrl+Shift+B, or select `Build > Build Solution`.
 
-### Run the tests
-After the build is complete, press F5 to run the sample.
+You run the Unit Tests to test the Client Library.
 
-First, you must obtain a Content Moderator API subscription key by [following the instructions on our website](<https://www.microsoft.com/cognitive-services/en-us/content-moderator/documentation/quickstart>).
 
 Microsoft will receive the images you upload and may use them to improve the Content Moderator
 API and related services. By submitting an image, you confirm you have consent from everyone in it.
