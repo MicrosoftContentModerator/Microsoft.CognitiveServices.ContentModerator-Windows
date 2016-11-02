@@ -89,7 +89,7 @@
     <Compile Include="ReviewTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ContentModeratorSDK_V2\ContentModeratorSDK.csproj">
+    <ProjectReference Include="..\ContentModeratorSDK\ContentModeratorSDK.csproj">
       <Project>{961284a5-1e23-416b-aba0-ff28c2327cab}</Project>
       <Name>ContentModeratorSDK</Name>
     </ProjectReference>

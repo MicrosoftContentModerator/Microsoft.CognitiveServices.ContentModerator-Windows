@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentModeratorSDK", "ContentModeratorSDK_V2\ContentModeratorSDK.csproj", "{961284A5-1E23-416B-ABA0-FF28C2327CAB}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentModeratorSDK", "ContentModeratorSDK\ContentModeratorSDK.csproj", "{961284A5-1E23-416B-ABA0-FF28C2327CAB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentModeratorSDK.Test", "ContentModeratorSDK\ContentModeratorSDK.Test.csproj", "{4C761CA8-EFB3-4AA8-8999-9D58C50033A2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContentModeratorSDK.Test", "ContentModeratorSDK.Tests\ContentModeratorSDK.Test.csproj", "{4C761CA8-EFB3-4AA8-8999-9D58C50033A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
