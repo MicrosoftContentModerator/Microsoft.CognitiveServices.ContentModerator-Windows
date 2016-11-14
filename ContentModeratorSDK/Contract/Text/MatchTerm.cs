@@ -10,6 +10,8 @@ namespace Microsoft.CognitiveServices.ContentModerator.Contract.Text
     {
         public string Term;
         public int Index;
+        public string ListId;
+        public string OriginalIndex;
     }
 
     public class MatchUrl
