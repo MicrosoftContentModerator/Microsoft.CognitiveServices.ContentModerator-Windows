@@ -113,15 +113,15 @@ namespace Microsoft.CognitiveServices.ContentModerator
 
         Task<string> TermDeleteAsync(string listId, string term, string language);
 
-        Task<string> TermDeleteAllAsync(string listId);
+        Task<string> TermDeleteAllAsync(string listId, string language);
         
-        Task<TermGetAllResult> TermGetAllTermsAsync(string listId);
+        Task<TermGetAllResult> TermGetAllTermsAsync(string listId, string language);
 
         #endregion
 
         #region Term Lists
 
-        Task<string> TermListRefreshIndexAsync(string listId);
+        Task<string> TermListRefreshIndexAsync(string listId, string language);
 
         /// <summary>
         /// Get all the content lists
