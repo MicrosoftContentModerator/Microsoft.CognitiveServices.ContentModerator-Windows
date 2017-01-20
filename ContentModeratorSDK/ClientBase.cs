@@ -193,7 +193,7 @@ namespace Microsoft.CognitiveServices.ContentModerator
 
                 var asyncState = new WebRequestAsyncState()
                 {
-                    RequestBytes = this.SerializeRequestBody(requestBody, string contentType),
+                    RequestBytes = this.SerializeRequestBody(requestBody, request.ContentType),
                     WebRequest = (HttpWebRequest)request,
                 };
 
