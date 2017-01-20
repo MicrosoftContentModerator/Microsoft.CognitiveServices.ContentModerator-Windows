@@ -13,7 +13,7 @@ namespace Microsoft.CognitiveServices.ContentModerator
     using Newtonsoft.Json.Serialization;
 
     public abstract class ClientBase
-    {  
+    {
 
         /// <summary>
         /// The subscription key
@@ -54,14 +54,14 @@ namespace Microsoft.CognitiveServices.ContentModerator
                 }
             }
             var request = WebRequest.Create(requestUrl.ToString());
-           
+
             return
                 await
                     this.SendAsync<T, TS>(method.ToString(), imageRequest, request);
         }
 
         protected async Task<T> InvokeAsync<T>(string operationUrl, Constants.HttpMethod method, List<KeyValue> metaData = null)
-        {   
+        {
             StringBuilder requestUrl = new StringBuilder(string.Concat(this.ApiRoot, operationUrl, "?"));
 
             if (metaData != null)
@@ -74,9 +74,9 @@ namespace Microsoft.CognitiveServices.ContentModerator
             }
 
             var request = WebRequest.Create(requestUrl.ToString());
-           
 
-            if(method != Constants.HttpMethod.GET )
+
+            if (method != Constants.HttpMethod.GET)
             {
                 request.ContentLength = 0;
             }
@@ -87,9 +87,9 @@ namespace Microsoft.CognitiveServices.ContentModerator
                 await
                     this.GetAsync<T>(method.ToString(), request);
         }
-        
 
-        
+
+
 
         /// <summary>
         /// Gets the asynchronous.
@@ -187,13 +187,13 @@ namespace Microsoft.CognitiveServices.ContentModerator
                 }
 
                 if (requestBody is Stream)
-                { 
+                {
                     request.ContentType = $"image/jpeg";
                 }
 
                 var asyncState = new WebRequestAsyncState()
                 {
-                    RequestBytes = this.SerializeRequestBody(requestBody),
+                    RequestBytes = this.SerializeRequestBody(requestBody, request.ContentType),
                     WebRequest = (HttpWebRequest)request,
                 };
 
@@ -317,26 +317,28 @@ namespace Microsoft.CognitiveServices.ContentModerator
             request.ContentType = "application/json";
         }
 
+        
         /// <summary>
-        /// Serialize the request body to byte array.
+        /// Serialize the request body to byte array
         /// </summary>
-        /// <typeparam name="T">Type of request object.</typeparam>
-        /// <param name="requestBody">Strong typed request object.</param>
-        /// <returns>Byte array.</returns>
-        private byte[] SerializeRequestBody<T>(T requestBody)
+        /// <typeparam name="T">Type of request object</typeparam>
+        /// <param name="requestBody">Strong typed request object</param>
+        /// <param name="contentType">Content Type of the Request</param>
+        /// <returns>Byte array</returns>
+        private byte[] SerializeRequestBody<T>(T requestBody, string contentType)
         {
-            if (requestBody == null || requestBody is Stream)
+            byte[] data = null;
+            if (requestBody != null && !(requestBody is Stream))
             {
-                return null;
+                if (contentType.Equals("application/json", StringComparison.InvariantCultureIgnoreCase))                {
+                    JsonSerializerSettings settings = new JsonSerializerSettings();
+                    settings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
+                    settings.ContractResolver = this.defaultResolver;
+                    data = System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestBody, settings));                }                else                {
+                    data = System.Text.Encoding.UTF8.GetBytes(requestBody as string);                }
             }
-            else
-            {
-                JsonSerializerSettings settings = new JsonSerializerSettings();
-                settings.DateFormatHandling = DateFormatHandling.IsoDateFormat;
-                settings.ContractResolver = this.defaultResolver;
 
-                return System.Text.Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(requestBody, settings));
-            }
+            return data;
         }
 
         /// <summary>
