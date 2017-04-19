@@ -1,5 +1,5 @@
 # Microsoft Content Moderator API: Windows Client Library
-This repo contains the Windows client library & sample for the Microsoft Content Moderator API, an offering within [Microsoft Cognitive Services](https://www.microsoft.com/cognitive-services).
+This repo contains the Windows client library & sample for the Microsoft Content Moderator API, part of [Microsoft Cognitive Services](https://azure.microsoft.com/en-us/services/cognitive-services/).
 * [Learn about the Content Moderator](https://azure.microsoft.com/en-us/services/cognitive-services/content-moderator/)
 * [Read the documentation](https://docs.microsoft.com/en-us/azure/cognitive-services/content-moderator/overview)
 
