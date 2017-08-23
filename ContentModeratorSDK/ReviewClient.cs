@@ -57,10 +57,20 @@ namespace Microsoft.CognitiveServices.ContentModerator
                         Constants.HttpMethod.GET, metaData)
                         .ConfigureAwait(false);
         }
-        public async Task<ReviewVideoFramesResponse> GetVideoFrames(string teamName, string reviewId, int startSeed, int noOfRecords)
+        public async Task<ReviewVideoFramesResponse> GetVideoFrames(string teamName, string reviewId, string startSeed, string noOfRecords)
         {
             List<KeyValue> metaData = new List<KeyValue>();
+            metaData.Add(new KeyValue()
+            {
+                Key = "startSeed",
+                Value = startSeed
+            });
 
+            metaData.Add(new KeyValue()
+            {
+                Key = "noOfRecords",
+                Value = noOfRecords
+            });
             return
                 await
                     InvokeAsync<ReviewVideoFramesResponse>(string.Format(Constants.GET_VIDEO_FRAMES, teamName, reviewId),
