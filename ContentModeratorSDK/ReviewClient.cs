@@ -86,7 +86,32 @@ namespace Microsoft.CognitiveServices.ContentModerator
                         string.Format(Constants.CREATE_REVIEW, teamName), Constants.HttpMethod.POST, metaData)
                         .ConfigureAwait(false);
         }
-
+        public async Task<bool> AddTranscript(string teamName, string reviewId, string transcript)
+        {
+            List<KeyValue> metaData = new List<KeyValue>();
+            await
+                InvokeAsync<string, string>(transcript,
+                    string.Format(Constants.ADD_TRANSCRIPT, teamName, reviewId), Constants.HttpMethod.PUT, metaData)
+                    .ConfigureAwait(false);
+            return true;
+        }
+        public async Task<bool> PublishVideoReview (string teamName, string reviewId)
+        {
+            List<KeyValue> metaData = new List<KeyValue>();
+            await
+                InvokeAsync<string>(string.Format(Constants.PUBLISH_VIDEO_REVIEW, teamName, reviewId), Constants.HttpMethod.PATCH, metaData)
+                    .ConfigureAwait(false);
+            return true;
+        }
+        public async Task<bool> AddVideoFrames (string teamName, string reviewId, List<VideoFrame> frames)
+        {
+            List<KeyValue> metaData = new List<KeyValue>();
+            await
+                   InvokeAsync<List<ReviewRequest>, string[]>(frames,
+                       string.Format(Constants.ADD_VIDEO_FRAMES, teamName), Constants.HttpMethod.POST, metaData)
+                       .ConfigureAwait(false);
+            return true;
+        }
         #endregion
 
         #region Job Operations
