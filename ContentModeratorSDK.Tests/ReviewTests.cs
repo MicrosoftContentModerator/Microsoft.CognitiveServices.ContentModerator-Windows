@@ -21,7 +21,7 @@ namespace ContentModeratorSDK.Test
         private readonly string reviewTeamName;
         public ReviewTests()
         {
-            this.client = new ReviewClient(ConfigurationManager.AppSettings["subscriptionkey"], ConfigurationManager.AppSettings["Review.ClientId"],ConfigurationManager.AppSettings["Review.ClientSecret"]);
+            this.client = new ReviewClient(ConfigurationManager.AppSettings["subscriptionkey"]);
             this.reviewTeamName = ConfigurationManager.AppSettings["Review.TeamName"];
         }
 
@@ -63,6 +63,16 @@ namespace ContentModeratorSDK.Test
                 ContentId = "sample.jpg",
                 Type = ContentType.Image,
                 Metadata = mData
+            };
+            ReviewRequest vreq = new VideoReviewRequest()
+            {
+                CallbackEndpoint = string.Empty,
+                Content = "https://rvdevmediaservicetest.streaming.mediaservices.windows.net/6405af61-e9d7-42e9-ac1f-f18ec094dfcb/YouTube_chef_c.ism/manifest",
+                ContentId = "sample.jpg",
+                Type = ContentType.Video,
+                Metadata = mData,
+                TimeScale = 1000,
+                Status = ReviewStatus.UnPublished
             };
             revrequests.Add(req1);
             var task = this.client.CreateReview(this.reviewTeamName, revrequests);

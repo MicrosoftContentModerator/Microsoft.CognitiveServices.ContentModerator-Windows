@@ -25,7 +25,8 @@ namespace Microsoft.CognitiveServices.ContentModerator
             POST,
             GET,
             DELETE,
-            PUT
+            PUT,
+            PATCH
         }
 
         public enum MediaType
@@ -89,7 +90,10 @@ namespace Microsoft.CognitiveServices.ContentModerator
         public const string GET_ALL_TEAM_WORKFLOWS = "/teams/{0}/workflows";
         public const string GET_TEAM_WORKFLOW = "/teams/{0}/workflows/{1}";
         public const string CREATE_WORKFLOW = "/teams/{0}/workflows/{1}";
-
+        public const string GET_VIDEO_FRAMES = "/teams/{0}/reviews/{1}/frames";
+        public const string ADD_VIDEO_FRAMES = "/teams/{0}/reviews/{1}/frames";
+        public const string ADD_TRANSCRIPT = "/teams/{0}/reviews/{1}/transcript";
+        public const string PUBLISH_VIDEO_REVIEW = "/teams/{0}/reviews/{1}/publish";
         #endregion
     }
 }

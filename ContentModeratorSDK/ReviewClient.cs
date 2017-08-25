@@ -13,7 +13,7 @@ using Newtonsoft.Json.Serialization;
 
 namespace Microsoft.CognitiveServices.ContentModerator
 {
-    public class ReviewClient : ClientBase,  IReviewClient
+    public class ReviewClient : ClientBase, IReviewClient
     {
         /// <summary>
         /// AD tenent url
@@ -24,18 +24,6 @@ namespace Microsoft.CognitiveServices.ContentModerator
         /// AD tenent url
         /// </summary>
         private string DEFAULT_AD_REVIEW_SVC_URL = Uri.EscapeUriString("https://api.contentmoderator.cognitive.microsoft.com/review");
-        
-
-        /// <summary>
-        /// The client Id
-        /// </summary>
-        private string _clientId;
-
-        /// <summary>
-        /// The client secret
-        /// </summary>
-        private string _clientSecret;
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ModeratorClient"/> class.
@@ -43,7 +31,7 @@ namespace Microsoft.CognitiveServices.ContentModerator
         /// <param name="subscriptionKey">The subscription key.</param>
         /// <param name="clientId">The client Id.</param>
         /// <param name="clientSecret">The client secret.</param>
-        public ReviewClient(string subscriptionKey, string clientId, string clientSecret) : this(subscriptionKey, "https://westus.api.cognitive.microsoft.com/contentmoderator/review/v1.0", clientId, clientSecret) { }
+        public ReviewClient(string subscriptionKey) : this(subscriptionKey, "https://westus.api.cognitive.microsoft.com/contentmoderator/review/v1.0") { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ModeratorClient"/> class.
@@ -52,12 +40,10 @@ namespace Microsoft.CognitiveServices.ContentModerator
         /// <param name="apiRoot">Root URI for the service endpoint.</param>
         /// <param name="clientId">The client Id.</param>
         /// <param name="clientSecret">The client secret.</param>
-        public ReviewClient(string subscriptionKey, string apiRoot, string clientId, string clientSecret)
+        public ReviewClient(string subscriptionKey, string apiRoot)
         {
             this.ApiRoot = apiRoot?.TrimEnd('/');
             this.SubscriptionKey = subscriptionKey;
-            _clientId = clientId;
-            _clientSecret = clientSecret;
         }
 
         #region Review Operations
@@ -71,7 +57,26 @@ namespace Microsoft.CognitiveServices.ContentModerator
                         Constants.HttpMethod.GET, metaData)
                         .ConfigureAwait(false);
         }
+        public async Task<ReviewVideoFramesResponse> GetVideoFrames(string teamName, string reviewId, string startSeed, string noOfRecords)
+        {
+            List<KeyValue> metaData = new List<KeyValue>();
+            metaData.Add(new KeyValue()
+            {
+                Key = "startSeed",
+                Value = startSeed
+            });
 
+            metaData.Add(new KeyValue()
+            {
+                Key = "noOfRecords",
+                Value = noOfRecords
+            });
+            return
+                await
+                    InvokeAsync<ReviewVideoFramesResponse>(string.Format(Constants.GET_VIDEO_FRAMES, teamName, reviewId),
+                        Constants.HttpMethod.GET, metaData)
+                        .ConfigureAwait(false);
+        }
         public async Task<string[]> CreateReview(string teamName, List<ReviewRequest> reviewRequests)
         {
             List<KeyValue> metaData = new List<KeyValue>();
@@ -81,7 +86,32 @@ namespace Microsoft.CognitiveServices.ContentModerator
                         string.Format(Constants.CREATE_REVIEW, teamName), Constants.HttpMethod.POST, metaData)
                         .ConfigureAwait(false);
         }
-
+        public async Task<bool> AddTranscript(string teamName, string reviewId, string transcript)
+        {
+            List<KeyValue> metaData = new List<KeyValue>();
+            await
+                InvokeAsync<string, string>(transcript,
+                    string.Format(Constants.ADD_TRANSCRIPT, teamName, reviewId), Constants.HttpMethod.PUT, metaData)
+                    .ConfigureAwait(false);
+            return true;
+        }
+        public async Task<bool> PublishVideoReview (string teamName, string reviewId)
+        {
+            List<KeyValue> metaData = new List<KeyValue>();
+            await
+                InvokeAsync<string>(string.Format(Constants.PUBLISH_VIDEO_REVIEW, teamName, reviewId), Constants.HttpMethod.PATCH, metaData)
+                    .ConfigureAwait(false);
+            return true;
+        }
+        public async Task<bool> AddVideoFrames (string teamName, string reviewId, List<VideoFrame> frames)
+        {
+            List<KeyValue> metaData = new List<KeyValue>();
+            await
+                   InvokeAsync<List<ReviewRequest>, string[]>(frames,
+                       string.Format(Constants.ADD_VIDEO_FRAMES, teamName), Constants.HttpMethod.POST, metaData)
+                       .ConfigureAwait(false);
+            return true;
+        }
         #endregion
 
         #region Job Operations
@@ -251,28 +281,8 @@ namespace Microsoft.CognitiveServices.ContentModerator
         #endregion
 
         #region Private methods
-
-        private async Task<TokenResult> GetToken()
-        {
-            string url = DEFAULT_AD_TENANT_URL;
-            StringBuilder requestBody = new StringBuilder();
-            requestBody.Append(string.Concat("resource=", DEFAULT_AD_REVIEW_SVC_URL));
-            requestBody.Append(string.Concat("&client_id=", _clientId));
-            requestBody.Append(string.Concat("&client_secret=", _clientSecret));
-            requestBody.Append(string.Concat("&grant_type=", "client_credentials"));
-            //string requestBody =
-            //    "resource=http%3A%2F%2Frvsvc&client_id=2c739b15-a26c-475e-b234-9bb366c2f70a&client_secret=cEKo9ocrj8apgRCgGuhpA96/SWcPUKTh1Z6NF40MBns=&grant_type=client_credentials";
-            var request = WebRequest.Create(url);
-            return
-                await
-                    this.SendAsync<string, TokenResult>("POST", requestBody.ToString(), request, headerCallback)
-                        .ConfigureAwait(false);
-        }
         private async Task<S> InvokeAsync<T, S>(dynamic imageRequest, string operationUrl, Constants.HttpMethod method, List<KeyValue> metaData)
         {
-            //Get Token
-            var token = await GetToken();
-
             StringBuilder requestUrl = new StringBuilder(string.Concat(this.ApiRoot, operationUrl, "?"));
             foreach (var k in metaData)
             {
@@ -281,7 +291,6 @@ namespace Microsoft.CognitiveServices.ContentModerator
             }
             requestUrl.Append(string.Concat("subscription-key=", this.SubscriptionKey, "&"));
             var request = WebRequest.Create(requestUrl.ToString());
-            request.Headers.Add("Authorization", string.Concat("Bearer ", token.access_token));
 
             return
                 await
@@ -291,9 +300,6 @@ namespace Microsoft.CognitiveServices.ContentModerator
 
         private async Task<T> InvokeAsync<T>(string operationUrl, Constants.HttpMethod method, List<KeyValue> metaData)
         {
-            //Get Token
-            var token = await GetToken();
-
             StringBuilder requestUrl = new StringBuilder(string.Concat(this.ApiRoot, operationUrl, "?"));
             foreach (var k in metaData)
             {
@@ -303,9 +309,6 @@ namespace Microsoft.CognitiveServices.ContentModerator
 
             requestUrl.Append(string.Concat("subscription-key=", this.SubscriptionKey, "&"));
             var request = WebRequest.Create(requestUrl.ToString());
-
-            request.Headers.Add("Authorization", string.Concat("Bearer ", token.access_token));
-
             return
                 await
                     this.GetAsync<T>(method.ToString(), request)
@@ -339,6 +342,6 @@ namespace Microsoft.CognitiveServices.ContentModerator
         }
         #endregion
 
-        
+
     }
 }
