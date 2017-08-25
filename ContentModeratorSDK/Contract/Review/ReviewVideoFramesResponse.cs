@@ -9,7 +9,6 @@ namespace Microsoft.CognitiveServices.ContentModerator.Contract.Review
 
     public class ReviewVideoFramesResponse
     {
-        public string ReviewId { get; set; }
         public List<VideoFrame> VideoFrames { get; set; }
     }
     public class VideoFrame

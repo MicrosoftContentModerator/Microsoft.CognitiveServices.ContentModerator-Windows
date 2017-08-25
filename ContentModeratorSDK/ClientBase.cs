@@ -41,13 +41,13 @@ namespace Microsoft.CognitiveServices.ContentModerator
         private readonly CamelCasePropertyNamesContractResolver defaultResolver = new CamelCasePropertyNamesContractResolver();
 
 
-        protected async Task<TS> InvokeAsync<T, TS>(dynamic imageRequest, string operationUrl, Constants.HttpMethod method, List<KeyValue> metaData = null)
+        protected async Task<TS> InvokeAsync<T, TS>(dynamic imageRequest, string operationUrl, Constants.HttpMethod method, List<KeyValue> queryParameters = null)
         {
             StringBuilder requestUrl = new StringBuilder(string.Concat(this.ApiRoot, operationUrl, "?"));
 
-            if (metaData != null)
+            if (queryParameters != null)
             {
-                foreach (var k in metaData)
+                foreach (var k in queryParameters)
                 {
                     requestUrl.Append(string.Concat(k.Key, "=", k.Value));
                     requestUrl.Append("&");

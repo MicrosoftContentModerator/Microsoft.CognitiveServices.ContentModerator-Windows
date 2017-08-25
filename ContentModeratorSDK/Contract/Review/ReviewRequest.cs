@@ -17,10 +17,22 @@ namespace Microsoft.CognitiveServices.ContentModerator.Contract.Review
         public ContentType Type { get; set; }
 
     }
+    /// <summary>
+    /// The Video Review Request
+    /// </summary>
     public class VideoReviewRequest : ReviewRequest
     {
+        /// <summary>
+        /// TimeScale of the Video. Get this info from AMS.
+        /// </summary>
         public long TimeScale { get; set; }
+        /// <summary>
+        /// Video Frames of the Video.
+        /// </summary>
         public List<VideoFrame> VideoFrames { get; set; }
+        /// <summary>
+        /// Comments.
+        /// </summary>
         public string Comments { get; set; }
     }
     

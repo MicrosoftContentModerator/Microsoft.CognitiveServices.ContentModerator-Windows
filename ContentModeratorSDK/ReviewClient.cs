@@ -62,14 +62,14 @@ namespace Microsoft.CognitiveServices.ContentModerator
         }
         public async Task<ReviewVideoFramesResponse> GetVideoFrames(string teamName, string reviewId, string startSeed, string noOfRecords)
         {
-            List<KeyValue> metaData = new List<KeyValue>();
-            metaData.Add(new KeyValue()
+            List<KeyValue> queryParameters = new List<KeyValue>();
+            queryParameters.Add(new KeyValue()
             {
                 Key = "startSeed",
                 Value = startSeed
             });
 
-            metaData.Add(new KeyValue()
+            queryParameters.Add(new KeyValue()
             {
                 Key = "noOfRecords",
                 Value = noOfRecords
@@ -78,41 +78,41 @@ namespace Microsoft.CognitiveServices.ContentModerator
             return
                 await
                     InvokeAsync<ReviewVideoFramesResponse>(string.Format(Constants.GET_VIDEO_FRAMES, teamName, reviewId),
-                        Constants.HttpMethod.GET, metaData)
+                        Constants.HttpMethod.GET, queryParameters)
                         .ConfigureAwait(false);
         }
         public async Task<string[]> CreateReview(string teamName, List<ReviewRequest> reviewRequests)
         {
-            List<KeyValue> metaData = new List<KeyValue>();
+            List<KeyValue> queryParameters = new List<KeyValue>();
             return
                 await
                     InvokeAsync<List<ReviewRequest>, string[]>(reviewRequests,
-                        string.Format(Constants.CREATE_REVIEW, teamName), Constants.HttpMethod.POST, metaData)
+                        string.Format(Constants.CREATE_REVIEW, teamName), Constants.HttpMethod.POST, queryParameters)
                         .ConfigureAwait(false);
         }
         public async Task<bool> AddTranscript(string teamName, string reviewId, byte[] transcript)
         {
-            List<KeyValue> metaData = new List<KeyValue>();
+            List<KeyValue> queryParameters = new List<KeyValue>();
             await
                 InvokeAsync<byte[], string>(transcript,
-                    string.Format(Constants.ADD_TRANSCRIPT, teamName, reviewId), Constants.HttpMethod.PUT, metaData)
+                    string.Format(Constants.ADD_TRANSCRIPT, teamName, reviewId), Constants.HttpMethod.PUT, queryParameters)
                     .ConfigureAwait(false);
             return true;
         }
         public async Task<bool> PublishVideoReview(string teamName, string reviewId)
         {
-            List<KeyValue> metaData = new List<KeyValue>();
+            List<KeyValue> queryParameters = new List<KeyValue>();
             await
-                InvokeAsync<string>(string.Format(Constants.PUBLISH_VIDEO_REVIEW, teamName, reviewId), Constants.HttpMethod.PATCH, metaData)
+                InvokeAsync<string>(string.Format(Constants.PUBLISH_VIDEO_REVIEW, teamName, reviewId), Constants.HttpMethod.PATCH, queryParameters)
                     .ConfigureAwait(false);
             return true;
         }
         public async Task<bool> AddVideoFrames(string teamName, string reviewId, List<VideoFrame> frames)
         {
-            List<KeyValue> metaData = new List<KeyValue>();
+            List<KeyValue> queryParameters = new List<KeyValue>();
             await
                    InvokeAsync<List<ReviewRequest>, string[]>(frames,
-                       string.Format(Constants.ADD_VIDEO_FRAMES, teamName), Constants.HttpMethod.POST, metaData)
+                       string.Format(Constants.ADD_VIDEO_FRAMES, teamName), Constants.HttpMethod.POST, queryParameters)
                        .ConfigureAwait(false);
             return true;
         }
@@ -122,11 +122,11 @@ namespace Microsoft.CognitiveServices.ContentModerator
 
         public async Task<JobDetailsResult> GetJobDetails(string teamName, string jobId)
         {
-            List<KeyValue> metaData = new List<KeyValue>();
+            List<KeyValue> queryParameters = new List<KeyValue>();
             return
                 await
                     InvokeAsync<JobDetailsResult>(string.Format(Constants.GET_JOB_DETAILS, teamName, jobId),
-                        Constants.HttpMethod.GET, metaData)
+                        Constants.HttpMethod.GET, queryParameters)
                         .ConfigureAwait(false);
         }
 
@@ -136,26 +136,26 @@ namespace Microsoft.CognitiveServices.ContentModerator
             dynamic jobRequest = new ExpandoObject();
             jobRequest.ContentValue = content;
 
-            List<KeyValue> metaData = new List<KeyValue>();
-            metaData.Add(new KeyValue()
+            List<KeyValue> queryParameters = new List<KeyValue>();
+            queryParameters.Add(new KeyValue()
             {
                 Key = "ContentType",
                 Value = contentType.ToString()
             });
 
-            metaData.Add(new KeyValue()
+            queryParameters.Add(new KeyValue()
             {
                 Key = "ContentId",
                 Value = contentId
             });
 
-            metaData.Add(new KeyValue()
+            queryParameters.Add(new KeyValue()
             {
                 Key = "WorkflowName",
                 Value = workFlowName
             });
 
-            metaData.Add(new KeyValue()
+            queryParameters.Add(new KeyValue()
             {
                 Key = "CallBackEndpoint",
                 Value = callBackEndpoint
@@ -164,7 +164,7 @@ namespace Microsoft.CognitiveServices.ContentModerator
             return
                 await
                     InvokeAsync<ExpandoObject, CreateJobResult>(jobRequest,
-                        string.Format(Constants.CREATE_JOB, teamName), Constants.HttpMethod.POST, metaData)
+                        string.Format(Constants.CREATE_JOB, teamName), Constants.HttpMethod.POST, queryParameters)
                         .ConfigureAwait(false);
         }
 
@@ -178,26 +178,26 @@ namespace Microsoft.CognitiveServices.ContentModerator
                 throw new Exception($"Image type: {imageType} not supported");
             }
             content.Position = 0;
-            List<KeyValue> metaData = new List<KeyValue>();
-            metaData.Add(new KeyValue()
+            List<KeyValue> queryParameters = new List<KeyValue>();
+            queryParameters.Add(new KeyValue()
             {
                 Key = "ContentType",
                 Value = contentType.ToString()
             });
 
-            metaData.Add(new KeyValue()
+            queryParameters.Add(new KeyValue()
             {
                 Key = "ContentId",
                 Value = contentId
             });
 
-            metaData.Add(new KeyValue()
+            queryParameters.Add(new KeyValue()
             {
                 Key = "WorkflowName",
                 Value = workFlowName
             });
 
-            metaData.Add(new KeyValue()
+            queryParameters.Add(new KeyValue()
             {
                 Key = "CallBackEndpoint",
                 Value = callBackEndpoint
@@ -206,7 +206,7 @@ namespace Microsoft.CognitiveServices.ContentModerator
             return
                 await
                     InvokeAsync<Stream, CreateJobResult>(content,
-                        string.Format(Constants.CREATE_JOB, teamName), Constants.HttpMethod.POST, metaData)
+                        string.Format(Constants.CREATE_JOB, teamName), Constants.HttpMethod.POST, queryParameters)
                         .ConfigureAwait(false);
         }
 
@@ -216,13 +216,13 @@ namespace Microsoft.CognitiveServices.ContentModerator
 
         public async Task<List<WorkFlowItem>> GetAllWorkflows(string teamName)
         {
-            List<KeyValue> metaData = new List<KeyValue>();
+            List<KeyValue> queryParameters = new List<KeyValue>();
             List<WorkFlowItem> workFlowList = new List<WorkFlowItem>();
 
             JArray result =
                 await
                     InvokeAsync<JArray>(string.Format(Constants.GET_ALL_TEAM_WORKFLOWS, teamName),
-                        Constants.HttpMethod.GET, metaData)
+                        Constants.HttpMethod.GET, queryParameters)
                         .ConfigureAwait(false);
 
             if (result?.Count > 0)
@@ -246,12 +246,12 @@ namespace Microsoft.CognitiveServices.ContentModerator
 
         public async Task<WorkFlowItem> GetWorkflow(string teamName, string workFlowName)
         {
-            List<KeyValue> metaData = new List<KeyValue>();
+            List<KeyValue> queryParameters = new List<KeyValue>();
             WorkFlowItem workFlowItem = null;
             JObject result =
                 await
                     InvokeAsync<JObject>(string.Format(Constants.GET_TEAM_WORKFLOW, teamName, workFlowName),
-                        Constants.HttpMethod.GET, metaData)
+                        Constants.HttpMethod.GET, queryParameters)
                         .ConfigureAwait(false);
 
             if (result != null)
@@ -285,10 +285,10 @@ namespace Microsoft.CognitiveServices.ContentModerator
         #endregion
 
         #region Private methods
-        private async Task<S> InvokeAsync<T, S>(dynamic imageRequest, string operationUrl, Constants.HttpMethod method, List<KeyValue> metaData)
+        private async Task<S> InvokeAsync<T, S>(dynamic imageRequest, string operationUrl, Constants.HttpMethod method, List<KeyValue> queryParameters)
         {
             StringBuilder requestUrl = new StringBuilder(string.Concat(this.ApiRoot, operationUrl, "?"));
-            foreach (var k in metaData)
+            foreach (var k in queryParameters)
             {
                 requestUrl.Append(string.Concat(k.Key, "=", k.Value));
                 requestUrl.Append("&");
@@ -302,10 +302,10 @@ namespace Microsoft.CognitiveServices.ContentModerator
                         .ConfigureAwait(false);
         }
 
-        private async Task<T> InvokeAsync<T>(string operationUrl, Constants.HttpMethod method, List<KeyValue> metaData)
+        private async Task<T> InvokeAsync<T>(string operationUrl, Constants.HttpMethod method, List<KeyValue> queryParameters)
         {
             StringBuilder requestUrl = new StringBuilder(string.Concat(this.ApiRoot, operationUrl, "?"));
-            foreach (var k in metaData)
+            foreach (var k in queryParameters)
             {
                 requestUrl.Append(string.Concat(k.Key, "=", k.Value));
                 requestUrl.Append("&");
