@@ -10,6 +10,7 @@ using Microsoft.CognitiveServices.ContentModerator.Contract.Review;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
+using System.Net.Http;
 
 namespace Microsoft.CognitiveServices.ContentModerator
 {
@@ -31,7 +32,9 @@ namespace Microsoft.CognitiveServices.ContentModerator
         /// <param name="subscriptionKey">The subscription key.</param>
         /// <param name="clientId">The client Id.</param>
         /// <param name="clientSecret">The client secret.</param>
-        public ReviewClient(string subscriptionKey) : this(subscriptionKey, "https://westus.api.cognitive.microsoft.com/contentmoderator/review/v1.0") { }
+        //public ReviewClient(string subscriptionKey) : this(subscriptionKey, "https://westus.api.cognitive.microsoft.com/contentmoderator/review/v1.0") { }
+        public ReviewClient(string subscriptionKey) : this(subscriptionKey, "https://wabashcognitiveservices.azure-api.net/review/v1.0") { }
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ModeratorClient"/> class.
@@ -71,6 +74,7 @@ namespace Microsoft.CognitiveServices.ContentModerator
                 Key = "noOfRecords",
                 Value = noOfRecords
             });
+
             return
                 await
                     InvokeAsync<ReviewVideoFramesResponse>(string.Format(Constants.GET_VIDEO_FRAMES, teamName, reviewId),
@@ -86,16 +90,16 @@ namespace Microsoft.CognitiveServices.ContentModerator
                         string.Format(Constants.CREATE_REVIEW, teamName), Constants.HttpMethod.POST, metaData)
                         .ConfigureAwait(false);
         }
-        public async Task<bool> AddTranscript(string teamName, string reviewId, string transcript)
+        public async Task<bool> AddTranscript(string teamName, string reviewId, byte[] transcript)
         {
             List<KeyValue> metaData = new List<KeyValue>();
             await
-                InvokeAsync<string, string>(transcript,
+                InvokeAsync<byte[], string>(transcript,
                     string.Format(Constants.ADD_TRANSCRIPT, teamName, reviewId), Constants.HttpMethod.PUT, metaData)
                     .ConfigureAwait(false);
             return true;
         }
-        public async Task<bool> PublishVideoReview (string teamName, string reviewId)
+        public async Task<bool> PublishVideoReview(string teamName, string reviewId)
         {
             List<KeyValue> metaData = new List<KeyValue>();
             await
@@ -103,7 +107,7 @@ namespace Microsoft.CognitiveServices.ContentModerator
                     .ConfigureAwait(false);
             return true;
         }
-        public async Task<bool> AddVideoFrames (string teamName, string reviewId, List<VideoFrame> frames)
+        public async Task<bool> AddVideoFrames(string teamName, string reviewId, List<VideoFrame> frames)
         {
             List<KeyValue> metaData = new List<KeyValue>();
             await

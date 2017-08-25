@@ -75,6 +75,7 @@
     <Compile Include="Contract\Review\KeyValue.cs" />
     <Compile Include="Contract\Review\ReviewRequest.cs" />
     <Compile Include="Contract\Review\ReviewResponse.cs" />
+    <Compile Include="Contract\Review\ReviewVideoFramesResponse.cs" />
     <Compile Include="Contract\Review\TokenResult.cs" />
     <Compile Include="Contract\Review\WorkFlowItem.cs" />
     <Compile Include="Contract\Status.cs" />
