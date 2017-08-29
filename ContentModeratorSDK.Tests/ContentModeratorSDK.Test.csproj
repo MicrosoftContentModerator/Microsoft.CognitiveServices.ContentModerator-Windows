@@ -82,6 +82,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AddTermTest.cs" />
     <Compile Include="ModeratorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ImageListAndMatchScenarios.cs" />

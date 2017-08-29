@@ -197,6 +197,16 @@ namespace Microsoft.CognitiveServices.ContentModerator
 
         }
 
+        public async Task<string> UpdateTermsBulkAsync(string listId, TermContent contents, string language)
+        {
+            return await InvokeAsync(
+                string.Format(Constants.TERM_UPDATEBULK, listId),
+                Constants.HttpMethod.POST,
+                contents
+            );
+
+        }
+
         public async Task<string> TermDeleteAsync(string listId, string term, string language)
         {
             var metaData = new List<KeyValue>();

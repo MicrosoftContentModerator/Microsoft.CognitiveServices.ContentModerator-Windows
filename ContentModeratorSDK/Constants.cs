@@ -67,6 +67,7 @@ namespace Microsoft.CognitiveServices.ContentModerator
         #region Term Urls
 
         public const string TERM_ADD = "/termlists/{0}/terms/{1}";
+        public const string TERM_UPDATEBULK = "/termlists/{0}/TermsBulk";
         public const string TERM_DELETE = "/termlists/{0}/terms/{1}";
         public const string TERM_DELETEALL = "/termlists/{0}/terms";
         public const string TERM_GETALLIDS = "/termlists/{0}/terms";

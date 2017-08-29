@@ -84,6 +84,7 @@
     <Compile Include="Contract\Text\PII.cs" />
     <Compile Include="Contract\Text\Result.cs" />
     <Compile Include="Contract\Text\ScreenTextResult.cs" />
+    <Compile Include="Contract\Text\TermContent.cs" />
     <Compile Include="Contract\Text\TermGetAllResult.cs" />
     <Compile Include="IListManagementClient.cs" />
     <Compile Include="IReviewClient.cs" />

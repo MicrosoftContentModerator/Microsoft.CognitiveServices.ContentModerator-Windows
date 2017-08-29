@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.CognitiveServices.ContentModerator.Contract.Text;
 
 namespace Microsoft.CognitiveServices.ContentModerator
 {
@@ -307,6 +308,54 @@ namespace Microsoft.CognitiveServices.ContentModerator
 
             return default(T);
         }
+
+
+        protected async Task<string> InvokeAsync(string operationUrl, Constants.HttpMethod method, TermContent metaData)
+        {
+            var requestUrl = new StringBuilder(string.Concat(this.ApiRoot, operationUrl));
+
+            var httpWebRequest = (HttpWebRequest)WebRequest.Create(requestUrl.ToString());
+            httpWebRequest.ContentType = "application/json;charset=utf-8";
+            httpWebRequest.Method = method.ToString();
+            httpWebRequest.Headers.Add("Ocp-Apim-Subscription-Key", this.SubscriptionKey);
+            string serializedResult = JsonConvert.SerializeObject(metaData);
+            byte[] requestBody = Encoding.UTF8.GetBytes(serializedResult);
+            using (var postStream = await httpWebRequest.GetRequestStreamAsync())
+            {
+                await postStream.WriteAsync(requestBody, 0, requestBody.Length);
+            }
+
+            try
+            {
+                var httpResponse = (HttpWebResponse)await httpWebRequest.GetResponseAsync();
+                if (httpResponse != null)
+                {
+                    using (var streamReader = new StreamReader(httpResponse.GetResponseStream()))
+                    {
+                        var result = streamReader.ReadToEnd();
+                        return result;
+                    }
+                }
+            }
+            catch (WebException e)
+            {
+                using (WebResponse response = e.Response)
+                {
+                    HttpWebResponse httpResponse = (HttpWebResponse)response;
+                    Console.WriteLine("Error code: {0}", httpResponse.StatusCode);
+                    using (Stream data = response.GetResponseStream())
+                    {
+                        string text = new StreamReader(data).ReadToEnd();
+                        Console.WriteLine(text);
+                    }
+                }
+
+                throw;
+            }
+            return null;
+        }
+
+
 
         /// <summary>
         /// Set request content type.
