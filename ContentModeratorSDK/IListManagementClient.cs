@@ -116,6 +116,8 @@ namespace Microsoft.CognitiveServices.ContentModerator
         Task<string> TermDeleteAllAsync(string listId, string language);
         
         Task<TermGetAllResult> TermGetAllTermsAsync(string listId, string language);
+        //can use for adding or deleting Terms on bulk
+        Task<string> UpdateTermsBulkAsync(string listId, TermContent contents, string language);
 
         #endregion
 
