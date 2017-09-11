@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace Microsoft.CognitiveServices.ContentModerator
 {
@@ -107,15 +108,25 @@ namespace Microsoft.CognitiveServices.ContentModerator
                     .ConfigureAwait(false);
             return true;
         }
-        public async Task<bool> AddVideoFrames(string teamName, string reviewId, List<VideoFrame> frames)
+        public async Task<bool> AddVideoFrames(string teamName, string reviewId, List<VideoFrame> frames, string frameZipPath)
         {
             List<KeyValue> queryParameters = new List<KeyValue>();
-            await
-                   InvokeAsync<List<ReviewRequest>, string[]>(frames,
-                       string.Format(Constants.ADD_VIDEO_FRAMES, teamName), Constants.HttpMethod.POST, queryParameters)
-                       .ConfigureAwait(false);
+
+            if (!string.IsNullOrWhiteSpace(frameZipPath))
+            {
+                    var response = ProcessMulitpartRequest(teamName, string.Format(Constants.ADD_VIDEO_FRAMES, teamName, reviewId), frames, frameZipPath, queryParameters);
+
+            }
+            else
+            {
+                await
+                       InvokeAsync<List<ReviewRequest>, string[]>(frames,
+                           string.Format(Constants.ADD_VIDEO_FRAMES, teamName), Constants.HttpMethod.POST, queryParameters)
+                           .ConfigureAwait(false);
+            }
             return true;
         }
+
         #endregion
 
         #region Job Operations
@@ -343,6 +354,36 @@ namespace Microsoft.CognitiveServices.ContentModerator
             }
 
             return result;
+        }
+        //multipart request post
+        private async Task<HttpResponseMessage> ProcessMulitpartRequest(string teamName, string operationUrl, List<VideoFrame> frames, string frameZipPath, List<KeyValue> queryParameters)
+        {
+            StringBuilder requestUrl = new StringBuilder(string.Concat(this.ApiRoot, operationUrl));
+            foreach (var k in queryParameters)
+            {
+                requestUrl.Append(string.Concat(k.Key, "=", k.Value));
+                requestUrl.Append("&");
+            }
+            var uri = string.Format(requestUrl.ToString());
+
+            string framesJson = JsonConvert.SerializeObject(frames);
+
+            MultipartFormDataContent form = new MultipartFormDataContent();
+            form.Add(new StringContent(framesJson), "FrameMetadata");
+            byte[] frameZip = File.ReadAllBytes(frameZipPath);
+            var zipContent = new ByteArrayContent(frameZip, 0, frameZip.Length);
+            zipContent.Headers.ContentType = new MediaTypeHeaderValue("multipart/form-data");
+            form.Add(zipContent, "FrameImageZip", new FileInfo(frameZipPath).Name);
+            try
+            {
+                var response = await this.PostAsync(uri, form);
+                return response;
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
         #endregion
 

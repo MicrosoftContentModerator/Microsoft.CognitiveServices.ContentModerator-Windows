@@ -11,6 +11,7 @@ namespace Microsoft.CognitiveServices.ContentModerator
     using Microsoft.CognitiveServices.ContentModerator.Contract.Image;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
+    using System.Net.Http;
 
     public abstract class ClientBase
     {
@@ -307,6 +308,44 @@ namespace Microsoft.CognitiveServices.ContentModerator
 
             return default(T);
         }
+
+        /// <summary>
+        /// this will process addframes multi process request
+        /// </summary>
+        /// <typeparam name="TRequest"></typeparam>
+        /// <typeparam name="TResponse"></typeparam>
+        /// <param name="uri"></param>
+        /// <param name="requestBody"></param>
+        /// <param name="setHeadersCallback"></param>
+        /// <returns></returns>
+        protected async Task<HttpResponseMessage> PostAsync(string uri, MultipartFormDataContent request, Action<WebRequest> setHeadersCallback = null)
+        {
+            try
+            {
+                var client = new HttpClient();
+
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", this.SubscriptionKey);
+
+                var response = await client.PostAsync(uri, request);
+
+                return response;
+            }
+            catch (AggregateException ae)
+            {
+                ae.Handle(e =>
+                {
+                    this.HandleException(e);
+                    return true;
+                });
+                return default(HttpResponseMessage);
+            }
+            catch (Exception e)
+            {
+                this.HandleException(e);
+                return default(HttpResponseMessage);
+            }
+        }
+
 
         /// <summary>
         /// Set request content type.
