@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Microsoft.CognitiveServices.ContentModerator.Contract.Review;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 using System.Net.Http;
 using System.Net.Http.Headers;
 
