@@ -196,12 +196,11 @@ namespace Microsoft.CognitiveServices.ContentModerator
                     RequestBytes = this.SerializeRequestBody(requestBody, request.ContentType),
                     WebRequest = (HttpWebRequest)request,
                 };
-
                 var continueRequestAsyncState = await Task.Factory.FromAsync<Stream>(
                                                     asyncState.WebRequest.BeginGetRequestStream,
                                                     asyncState.WebRequest.EndGetRequestStream,
                                                     asyncState,
-                                                    TaskCreationOptions.None).ContinueWith<WebRequestAsyncState>(
+                                                    TaskCreationOptions.None).ContinueWith<WebRequestAsyncState> (
                                                        task =>
                                                        {
                                                            var requestAsyncState = (WebRequestAsyncState)task.AsyncState;
@@ -222,22 +221,10 @@ namespace Microsoft.CognitiveServices.ContentModerator
 
                                                            return requestAsyncState;
                                                        });
-
                 var continueWebRequest = continueRequestAsyncState.WebRequest;
-                var getResponse = Task.Factory.FromAsync<WebResponse>(
-                    continueWebRequest.BeginGetResponse,
-                    continueWebRequest.EndGetResponse,
-                    continueRequestAsyncState);
-
-                await Task.WhenAny(getResponse, Task.Delay(this.DefaultTimeout));
-
+                var getResponse = await continueWebRequest.GetResponseAsync();
                 //Abort request if timeout has expired
-                if (!getResponse.IsCompleted)
-                {
-                    request.Abort();
-                }
-
-                return this.ProcessAsyncResponse<TResponse>(getResponse.Result as HttpWebResponse);
+                return this.ProcessAsyncResponse<TResponse>(getResponse as HttpWebResponse);
             }
             catch (AggregateException ae)
             {
@@ -388,10 +375,9 @@ namespace Microsoft.CognitiveServices.ContentModerator
             WebException webException = exception as WebException;
             if (webException != null && webException.Response != null)
             {
-                if (webException.Response.ContentType.ToLower().Contains("application/json"))
+                if (webException.Response.ContentType.ToLower().Contains("application/json") || webException.Response.ContentType.ToLower().Contains("text/plain"))
                 {
                     Stream stream = null;
-
                     try
                     {
                         stream = webException.Response.GetResponseStream();
@@ -403,14 +389,26 @@ namespace Microsoft.CognitiveServices.ContentModerator
                                 stream = null;
                                 errorObjectString = reader.ReadToEnd();
                             }
-
-                            ClientError errorCollection = JsonConvert.DeserializeObject<ClientError>(errorObjectString);
-                            if (errorCollection != null)
+                            if (webException.Response.ContentType.ToLower().Contains("application/json"))
                             {
-                                throw new ClientException
+                                ClientError errorCollection = JsonConvert.DeserializeObject<ClientError>(errorObjectString);
+                                if (errorCollection != null)
                                 {
-                                    Error = errorCollection,
-                                };
+                                    throw new ClientException
+                                    {
+                                        Error = errorCollection
+                                    };
+                                }
+                            }else
+                            {
+                                ApiError apiError = JsonConvert.DeserializeObject<ApiError>(errorObjectString);
+                                if(apiError != null)
+                                {
+                                    throw new ClientException
+                                    {
+                                        ApiError = apiError
+                                    };
+                                }
                             }
                         }
                     }
@@ -420,7 +418,6 @@ namespace Microsoft.CognitiveServices.ContentModerator
                     }
                 }
             }
-
             throw exception;
         }
 

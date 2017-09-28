@@ -53,6 +53,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiError.cs" />
     <Compile Include="ClientBase.cs" />
     <Compile Include="ClientError.cs" />
     <Compile Include="ClientException.cs" />

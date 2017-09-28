@@ -138,7 +138,7 @@ namespace Microsoft.CognitiveServices.ContentModerator
         /// Gets or sets the httpError message.
         /// </summary>
         public ClientError Error { get; set; }
-
+        public ApiError ApiError { get; set; }
         /// <summary>
         /// Create Client Exception of Bad Request.
         /// </summary>
