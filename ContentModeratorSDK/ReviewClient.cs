@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Web;
 
 namespace Microsoft.CognitiveServices.ContentModerator
 {
@@ -107,13 +108,13 @@ namespace Microsoft.CognitiveServices.ContentModerator
                     .ConfigureAwait(false);
             return true;
         }
-        public async Task<bool> AddVideoFrames(string teamName, string reviewId, List<VideoFrame> frames, string frameZipPath)
+        public async Task<bool> AddVideoFrames(string teamName, string reviewId, string framesList,List<VideoFrame> frames, string frameZipPath)
         {
             List<KeyValue> queryParameters = new List<KeyValue>();
 
             if (!string.IsNullOrWhiteSpace(frameZipPath))
             {
-                    var response = ProcessMulitpartRequest(teamName, string.Format(Constants.ADD_VIDEO_FRAMES, teamName, reviewId), frames, frameZipPath, queryParameters);
+                    var response = ExecuteAddFramesMultipartRequest(teamName, reviewId, framesList, frameZipPath);
 
             }
             else
@@ -354,36 +355,45 @@ namespace Microsoft.CognitiveServices.ContentModerator
 
             return result;
         }
-        //multipart request post
-        private async Task<HttpResponseMessage> ProcessMulitpartRequest(string teamName, string operationUrl, List<VideoFrame> frames, string frameZipPath, List<KeyValue> queryParameters)
+
+
+
+        /// <summary>
+        /// Posts frames to add it to the video.
+        /// </summary>
+        /// <param name="reviewId">reviewID</param>
+        /// <param name="reviewFrameList">reviewFrameList</param>
+        /// <returns>Response of AddFrames Api call</returns>
+        private async Task<HttpResponseMessage> ExecuteAddFramesMultipartRequest(string teamName, string reviewId, string reviewFrameList, string filePath)
         {
-            StringBuilder requestUrl = new StringBuilder(string.Concat(this.ApiRoot, operationUrl));
-            foreach (var k in queryParameters)
-            {
-                requestUrl.Append(string.Concat(k.Key, "=", k.Value));
-                requestUrl.Append("&");
-            }
-            var uri = string.Format(requestUrl.ToString());
+            var client = new HttpClient();
+            client.Timeout = TimeSpan.FromMinutes(10);
+            var requestUrl = string.Concat(this.ApiRoot, Constants.ADD_VIDEO_FRAMES);
+            var uri = string.Format(requestUrl, teamName, reviewId);
 
-            string framesJson = JsonConvert.SerializeObject(frames);
-
+            client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", this.SubscriptionKey);
+            string frameZipPath = filePath;
+            string filename = Path.GetFileName(frameZipPath);
             MultipartFormDataContent form = new MultipartFormDataContent();
-            form.Add(new StringContent(framesJson), "FrameMetadata");
+            form.Add(new StringContent(reviewFrameList), "FrameMetadata");
             byte[] frameZip = File.ReadAllBytes(frameZipPath);
             var zipContent = new ByteArrayContent(frameZip, 0, frameZip.Length);
-            zipContent.Headers.ContentType = new MediaTypeHeaderValue("multipart/form-data");
-            form.Add(zipContent, "FrameImageZip", new FileInfo(frameZipPath).Name);
+            zipContent.Headers.ContentType = new MediaTypeHeaderValue(MimeMapping.GetMimeMapping(filename));
+            form.Add(zipContent, "FrameImageZip", "frameZip.zip");
+            HttpResponseMessage response = new HttpResponseMessage();
             try
             {
-                var response = await this.PostAsync(uri, form);
-                return response;
-
+                response = await client.PostAsync(uri, form);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                throw ex;
+                Console.WriteLine(e.Message);
             }
+            return response;
         }
+
+
+
         #endregion
 
 
