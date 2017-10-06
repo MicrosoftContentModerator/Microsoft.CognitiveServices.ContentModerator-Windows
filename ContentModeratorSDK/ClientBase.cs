@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,6 +10,7 @@ namespace Microsoft.CognitiveServices.ContentModerator
     using Microsoft.CognitiveServices.ContentModerator.Contract.Image;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
+    using System.Net.Http;
 
     public abstract class ClientBase
     {
@@ -41,13 +41,13 @@ namespace Microsoft.CognitiveServices.ContentModerator
         private readonly CamelCasePropertyNamesContractResolver defaultResolver = new CamelCasePropertyNamesContractResolver();
 
 
-        protected async Task<TS> InvokeAsync<T, TS>(dynamic imageRequest, string operationUrl, Constants.HttpMethod method, List<KeyValue> metaData = null)
+        protected async Task<TS> InvokeAsync<T, TS>(dynamic imageRequest, string operationUrl, Constants.HttpMethod method, List<KeyValue> queryParameters = null)
         {
             StringBuilder requestUrl = new StringBuilder(string.Concat(this.ApiRoot, operationUrl, "?"));
 
-            if (metaData != null)
+            if (queryParameters != null)
             {
-                foreach (var k in metaData)
+                foreach (var k in queryParameters)
                 {
                     requestUrl.Append(string.Concat(k.Key, "=", k.Value));
                     requestUrl.Append("&");
@@ -196,12 +196,11 @@ namespace Microsoft.CognitiveServices.ContentModerator
                     RequestBytes = this.SerializeRequestBody(requestBody, request.ContentType),
                     WebRequest = (HttpWebRequest)request,
                 };
-
                 var continueRequestAsyncState = await Task.Factory.FromAsync<Stream>(
                                                     asyncState.WebRequest.BeginGetRequestStream,
                                                     asyncState.WebRequest.EndGetRequestStream,
                                                     asyncState,
-                                                    TaskCreationOptions.None).ContinueWith<WebRequestAsyncState>(
+                                                    TaskCreationOptions.None).ContinueWith<WebRequestAsyncState> (
                                                        task =>
                                                        {
                                                            var requestAsyncState = (WebRequestAsyncState)task.AsyncState;
@@ -222,22 +221,10 @@ namespace Microsoft.CognitiveServices.ContentModerator
 
                                                            return requestAsyncState;
                                                        });
-
                 var continueWebRequest = continueRequestAsyncState.WebRequest;
-                var getResponse = Task.Factory.FromAsync<WebResponse>(
-                    continueWebRequest.BeginGetResponse,
-                    continueWebRequest.EndGetResponse,
-                    continueRequestAsyncState);
-
-                await Task.WhenAny(getResponse, Task.Delay(this.DefaultTimeout));
-
+                var getResponse = await continueWebRequest.GetResponseAsync();
                 //Abort request if timeout has expired
-                if (!getResponse.IsCompleted)
-                {
-                    request.Abort();
-                }
-
-                return this.ProcessAsyncResponse<TResponse>(getResponse.Result as HttpWebResponse);
+                return this.ProcessAsyncResponse<TResponse>(getResponse as HttpWebResponse);
             }
             catch (AggregateException ae)
             {
@@ -309,6 +296,44 @@ namespace Microsoft.CognitiveServices.ContentModerator
         }
 
         /// <summary>
+        /// this will process addframes multi process request
+        /// </summary>
+        /// <typeparam name="TRequest"></typeparam>
+        /// <typeparam name="TResponse"></typeparam>
+        /// <param name="uri"></param>
+        /// <param name="requestBody"></param>
+        /// <param name="setHeadersCallback"></param>
+        /// <returns></returns>
+        protected async Task<HttpResponseMessage> PostAsync(string uri, MultipartFormDataContent request, Action<WebRequest> setHeadersCallback = null)
+        {
+            try
+            {
+                var client = new HttpClient();
+
+                client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", this.SubscriptionKey);
+
+                var response = await client.PostAsync(uri, request);
+
+                return response;
+            }
+            catch (AggregateException ae)
+            {
+                ae.Handle(e =>
+                {
+                    this.HandleException(e);
+                    return true;
+                });
+                return default(HttpResponseMessage);
+            }
+            catch (Exception e)
+            {
+                this.HandleException(e);
+                return default(HttpResponseMessage);
+            }
+        }
+
+
+        /// <summary>
         /// Set request content type.
         /// </summary>
         /// <param name="request">Web request object.</param>
@@ -350,10 +375,9 @@ namespace Microsoft.CognitiveServices.ContentModerator
             WebException webException = exception as WebException;
             if (webException != null && webException.Response != null)
             {
-                if (webException.Response.ContentType.ToLower().Contains("application/json"))
+                if (webException.Response.ContentType.ToLower().Contains("application/json") || webException.Response.ContentType.ToLower().Contains("text/plain"))
                 {
                     Stream stream = null;
-
                     try
                     {
                         stream = webException.Response.GetResponseStream();
@@ -365,14 +389,26 @@ namespace Microsoft.CognitiveServices.ContentModerator
                                 stream = null;
                                 errorObjectString = reader.ReadToEnd();
                             }
-
-                            ClientError errorCollection = JsonConvert.DeserializeObject<ClientError>(errorObjectString);
-                            if (errorCollection != null)
+                            if (webException.Response.ContentType.ToLower().Contains("application/json"))
                             {
-                                throw new ClientException
+                                ClientError errorCollection = JsonConvert.DeserializeObject<ClientError>(errorObjectString);
+                                if (errorCollection != null)
                                 {
-                                    Error = errorCollection,
-                                };
+                                    throw new ClientException
+                                    {
+                                        Error = errorCollection
+                                    };
+                                }
+                            }else
+                            {
+                                ApiError apiError = JsonConvert.DeserializeObject<ApiError>(errorObjectString);
+                                if(apiError != null)
+                                {
+                                    throw new ClientException
+                                    {
+                                        ApiError = apiError
+                                    };
+                                }
                             }
                         }
                     }
@@ -382,7 +418,6 @@ namespace Microsoft.CognitiveServices.ContentModerator
                     }
                 }
             }
-
             throw exception;
         }
 

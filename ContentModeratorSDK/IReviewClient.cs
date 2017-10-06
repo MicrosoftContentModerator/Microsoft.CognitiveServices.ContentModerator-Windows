@@ -27,6 +27,17 @@ namespace Microsoft.CognitiveServices.ContentModerator
         /// <returns></returns>
         Task<string[]> CreateReview(string teamName, List<ReviewRequest> reviewRequests);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="teamName"></param>
+        /// <param name="reviewId"></param>
+        /// <param name="framesList"></param>
+        /// <param name="frames"></param>
+        /// <param name="frameZipPath"></param>
+        /// <returns></returns>
+        Task<bool> AddVideoFrames(string teamName, string reviewId, string framesList, List<VideoFrame> frames, string frameZipPath);
+
         #endregion
 
         #region Job Operations

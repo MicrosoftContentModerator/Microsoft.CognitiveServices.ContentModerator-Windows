@@ -21,7 +21,7 @@ namespace ContentModeratorSDK.Test
         private readonly string reviewTeamName;
         public ReviewTests()
         {
-            this.client = new ReviewClient(ConfigurationManager.AppSettings["subscriptionkey"], ConfigurationManager.AppSettings["Review.ClientId"],ConfigurationManager.AppSettings["Review.ClientSecret"]);
+            this.client = new ReviewClient(ConfigurationManager.AppSettings["subscriptionkey"]);
             this.reviewTeamName = ConfigurationManager.AppSettings["Review.TeamName"];
         }
 
@@ -38,7 +38,20 @@ namespace ContentModeratorSDK.Test
             var result = task.Result;
             Assert.IsNotNull(result);
         }
-
+        [TestMethod]
+        public void GetVideoFrames()
+        {
+            var task = this.client.GetVideoFrames(this.reviewTeamName, "Review Id", "0", "100");
+            var result = task.Result;
+            Assert.IsNotNull(result);
+        }
+        [TestMethod]
+        public void AddTranscript()
+        {
+            var task = this.client.AddTranscript(this.reviewTeamName, "201708v1c8b472a967c40d8b1af9b3b3884834d", File.ReadAllBytes(@"C:\Users\v-aljeng\OneDrive\3306\Docs\vttF.txt"));
+            var result = task.Result;
+            Assert.IsNotNull(result);
+        }
         [TestMethod]
         public void CreateReview()
         {
@@ -64,12 +77,45 @@ namespace ContentModeratorSDK.Test
                 Type = ContentType.Image,
                 Metadata = mData
             };
+            
             revrequests.Add(req1);
             var task = this.client.CreateReview(this.reviewTeamName, revrequests);
             var result = task.Result;
             Assert.IsNotNull(result);
         }
-
+        [TestMethod]
+        public void CreateVideoReview()
+        {
+            List<ReviewRequest> revrequests = new List<ReviewRequest>();
+            List<KeyValue> mData = new List<KeyValue>();
+            KeyValue kv = new KeyValue()
+            {
+                Key = "a",
+                Value = "True"
+            };
+            mData.Add(kv);
+            kv = new KeyValue()
+            {
+                Key = "r",
+                Value = "False"
+            };
+            mData.Add(kv);
+            ReviewRequest vreq = new VideoReviewRequest()
+            {
+                CallbackEndpoint = string.Empty,
+                Content = "Video Streming Endpoint",
+                ContentId = "sample video",
+                Type = ContentType.Video,
+                Metadata = mData,
+                TimeScale = 1000,
+                Status = ReviewStatus.UnPublished,
+                VideoFrames = new List<VideoFrame>() { new VideoFrame() { Timestamp = "10", FrameImage = "https://moderatorsampleimages.blob.core.windows.net/samples/sample.jpg" } }
+            };
+            revrequests.Add(vreq);
+            var task = this.client.CreateReview(this.reviewTeamName, revrequests);
+            var result = task.Result;
+            Assert.IsNotNull(result);
+        }
         [TestMethod]
         public void GetJobDetails()
         {

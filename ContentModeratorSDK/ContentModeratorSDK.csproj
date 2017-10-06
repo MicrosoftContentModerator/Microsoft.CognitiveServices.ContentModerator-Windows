@@ -45,6 +45,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -53,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiError.cs" />
     <Compile Include="ClientBase.cs" />
     <Compile Include="ClientError.cs" />
     <Compile Include="ClientException.cs" />
@@ -75,6 +77,7 @@
     <Compile Include="Contract\Review\KeyValue.cs" />
     <Compile Include="Contract\Review\ReviewRequest.cs" />
     <Compile Include="Contract\Review\ReviewResponse.cs" />
+    <Compile Include="Contract\Review\ReviewVideoFramesResponse.cs" />
     <Compile Include="Contract\Review\TokenResult.cs" />
     <Compile Include="Contract\Review\WorkFlowItem.cs" />
     <Compile Include="Contract\Status.cs" />
@@ -110,7 +113,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>"nugetpackager\PostBuildCommand.bat" "$(TargetPath)" "$(ProjectName)" "$(ProjectDir)" "$(TargetDir)"</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
